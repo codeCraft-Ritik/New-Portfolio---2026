@@ -107,7 +107,7 @@ const BootLoader = ({ progress, liteMode = false }) => {
         <span className="boot-loader__radar-sweep" />
       </div>}
 
-      <div className="boot-loader__sparks">
+      {!liteMode && <div className="boot-loader__sparks">
         {sparks.map((spark) => (
           <span
             key={`spark-${spark.id}`}
@@ -115,9 +115,9 @@ const BootLoader = ({ progress, liteMode = false }) => {
             style={{ '--px': spark.x, '--py': spark.y, '--pd': spark.delay, '--pt': spark.duration }}
           />
         ))}
-      </div>
+      </div>}
 
-      <div className="boot-loader__shards">
+      {!liteMode && <div className="boot-loader__shards">
         {shards.map((shard, index) => (
           <span
             key={`shard-${index}`}
@@ -125,7 +125,7 @@ const BootLoader = ({ progress, liteMode = false }) => {
             style={{ '--sx': shard.x, '--sy': shard.y, '--sd': shard.delay }}
           />
         ))}
-      </div>
+      </div>}
 
       <div className="boot-loader__center">
         <div className="boot-loader__pulse" style={{ '--progress': progress / 100 }} />
@@ -201,19 +201,19 @@ const BootLoader = ({ progress, liteMode = false }) => {
           ))}
         </div>
 
-        <div className="boot-loader__equalizer" aria-hidden="true">
+        {!liteMode && <div className="boot-loader__equalizer" aria-hidden="true">
           {equalizer.map((bar) => (
             <span key={`bar-${bar.id}`} className="boot-loader__bar" style={{ '--bar-delay': bar.delay }} />
           ))}
-        </div>
+        </div>}
 
-        <div className="boot-loader__briefings" aria-hidden="true">
+        {!liteMode && <div className="boot-loader__briefings" aria-hidden="true">
           {briefings.map((item, idx) => (
             <span key={item} style={{ '--brief-delay': `${idx * 0.08}s` }}>
               {item}
             </span>
           ))}
-        </div>
+        </div>}
       </div>
     </motion.div>
   );
@@ -276,7 +276,7 @@ function App() {
       return undefined;
     }
 
-    const mediaQuery = window.matchMedia('(max-width: 820px), (pointer: coarse), (hover: none), (prefers-reduced-motion: reduce)');
+    const mediaQuery = window.matchMedia('(max-width: 1023px), (pointer: coarse), (hover: none), (prefers-reduced-motion: reduce)');
 
     const syncMode = () => setLiteMode(mediaQuery.matches);
     syncMode();
@@ -298,8 +298,8 @@ function App() {
     let pageReady = document.readyState === 'complete';
     let cancelled = false;
 
-    const minLoaderDuration = 2200;
-    const maxLoaderDuration = 3600;
+    const minLoaderDuration = liteMode ? 900 : 1400;
+    const maxLoaderDuration = liteMode ? 2200 : 2800;
 
     const onPageReady = () => {
       pageReady = true;
@@ -312,7 +312,7 @@ function App() {
       if (cancelled) return;
       setProgress(100);
       setIsLoading(false);
-    }, maxLoaderDuration + 500);
+    }, maxLoaderDuration + 600);
 
     const tick = (timestamp) => {
       if (cancelled) return;
@@ -348,7 +348,7 @@ function App() {
       clearTimeout(finishTimeout);
       clearTimeout(fallbackFinishTimeout);
     };
-  }, []);
+  }, [liteMode]);
 
   useEffect(() => {
     if (isLoading || liteMode) return undefined;
@@ -431,13 +431,15 @@ function App() {
   };
 
   return (
-    <main className="relative bg-slate-950 min-h-screen text-slate-200 selection:bg-cyan-500/30">
+    <main className="relative bg-slate-950 min-h-svh overflow-x-clip text-slate-200 selection:bg-cyan-500/30">
       <AnimatePresence>{isLoading && <BootLoader progress={progress} liteMode={liteMode} />}</AnimatePresence>
 
       <motion.div
         aria-hidden="true"
-        className="fixed top-0 left-0 right-0 h-0.75 z-70 origin-left"
+        className="fixed top-0 left-0 right-0 origin-left"
         style={{
+          height: 3,
+          zIndex: 70,
           scaleX: progressScaleX,
           opacity: progressGlow,
           background:
@@ -449,9 +451,9 @@ function App() {
       {/* Animated Background */}
       <Background liteMode={liteMode} />
 
-      <div className="relative z-10">
+        <div className="relative z-10">
         <Navbar />
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 space-y-12 sm:space-y-16 md:space-y-24 pb-24 md:pb-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 space-y-12 sm:space-y-16 md:space-y-24 pb-28 md:pb-12 lg:pb-0">
           <ScrollDepthSection data-reveal data-reveal-delay="0" intensity={liteMode ? 24 : 60} direction={1} disabled={liteMode}>
             <Hero liteMode={liteMode} />
           </ScrollDepthSection>
@@ -491,7 +493,8 @@ function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.9 }}
             transition={{ duration: 0.25 }}
-              className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-60 h-12 w-12 rounded-2xl border border-cyan-400/35 bg-slate-900/70 text-cyan-300 backdrop-blur-xl transition-all hover:-translate-y-1 hover:text-white hover:border-cyan-300 hover:shadow-[0_0_22px_rgba(34,211,238,0.35)]"
+              className="fixed right-4 md:right-8 z-60 h-12 w-12 rounded-2xl border border-cyan-400/35 bg-slate-900/70 text-cyan-300 backdrop-blur-xl transition-all hover:-translate-y-1 hover:text-white hover:border-cyan-300 hover:shadow-[0_0_22px_rgba(34,211,238,0.35)]"
+              style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)' }}
             aria-label="Back to top"
           >
             <ArrowUp className="w-5 h-5 mx-auto" />

@@ -14,7 +14,11 @@
 
 /* ── Base layer ── */
 @layer base {
-  html  { scroll-behavior: smooth; }
+  html  {
+    scroll-behavior: smooth;
+    overflow-x: clip;
+    width: 100%;
+  }
   body  {
     background:
       radial-gradient(1100px 700px at 12% 12%, rgba(249, 115, 22, 0.12), transparent 60%),
@@ -24,7 +28,16 @@
     color: #e2e8f0;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
+    width: 100%;
+    max-width: 100%;
+    overscroll-behavior-x: none;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   h1, h2, h3, .font-display {
@@ -162,7 +175,7 @@ main {
 @media (max-width: 480px) {
   html { font-size: 14px; }
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
     scroll-behavior: smooth;
   }
   
@@ -179,6 +192,10 @@ main {
     transform: none !important;
     opacity: 1 !important;
   }
+
+  .scroll-depth-glint {
+    display: none;
+  }
   
   .globe-scene {
     height: 300px !important;
@@ -192,6 +209,13 @@ main {
   
   .max-w-7xl > * {
     padding: 0 !important;
+  }
+
+  .boot-loader__telemetry,
+  .boot-loader__streams,
+  .boot-loader__briefings,
+  .boot-loader__equalizer {
+    display: none;
   }
 }
 
@@ -215,6 +239,34 @@ main {
   
   [data-reveal] {
     transform: translateY(32px) scale(0.99);
+  }
+
+  .animate-float-slow,
+  .animate-float-medium,
+  .animate-float-reverse,
+  .animate-spin-slow,
+  .animate-spin-reverse,
+  .animate-holo-ring,
+  .animate-data-node,
+  .animate-scan-streak,
+  .animate-scan-streak-reverse,
+  .animate-rotate-square,
+  .animate-rotate-square-reverse,
+  .animate-rotate-square-slow,
+  .animate-hex-bounce,
+  .animate-float-card,
+  .animate-morph-shape,
+  .animate-kinetic-path,
+  .animate-glow-pulse,
+  .animate-perspective-tilt,
+  .animate-quantum-flicker {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  [data-reveal] {
+    transition-duration: 0.55s;
   }
 }
 

@@ -76,7 +76,7 @@ const About = () => {
             </p>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/5">
                 <p className="text-3xl font-black text-cyan-400">8.40</p>
                 <p className="text-xs text-gray-500 uppercase tracking-wider">CGPA</p>
@@ -119,7 +119,7 @@ const About = () => {
           viewport={{ once: true }}
           className="lg:col-span-1"
         >
-          <div className="bg-white/2 border border-white/10 rounded-3xl p-6 backdrop-blur-xl sticky top-24">
+          <div className="bg-white/2 border border-white/10 rounded-3xl p-6 backdrop-blur-xl lg:sticky lg:top-24">
             {/* Profile Image */}
             <div className="relative mb-6">
               <div className="w-full aspect-square rounded-2xl bg-linear-to-br from-cyan-500 via-blue-600 to-purple-600 p-1">
@@ -228,7 +228,7 @@ const About = () => {
         </div>
 
         {/* Marquee Strip - Full viewport width, single continuous row */}
-        <div className="w-screen relative left-1/2 -translate-x-1/2 overflow-hidden py-4">
+        <div className="w-full overflow-hidden py-4">
           {/* Soft edge fades */}
           <div className="absolute left-0 top-0 bottom-0 w-36 bg-linear-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-36 bg-linear-to-l from-slate-950 to-transparent z-10 pointer-events-none" />

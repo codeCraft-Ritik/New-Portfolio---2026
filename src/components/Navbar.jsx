@@ -84,7 +84,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed right-8 top-1/2 -translate-y-1/2 z-50 hidden md:block">
+      <nav className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:block">
         <div className="flex flex-col gap-4 p-3 bg-white/2 border border-white/10 backdrop-blur-2xl rounded-full shadow-2xl">
           {navLinks.map((link) => (
             <div key={link.id} className="relative group flex items-center justify-center">
@@ -116,14 +116,17 @@ const Navbar = () => {
         </div>
       </nav>
 
-      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 md:hidden">
-        <div className="flex items-center gap-1 p-2 bg-slate-900/70 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl max-w-[95vw] overflow-x-auto">
+      <nav
+        className="fixed inset-x-0 z-50 px-3 lg:hidden pointer-events-none"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
+      >
+        <div className="mx-auto grid grid-cols-6 items-center gap-1 p-2 bg-slate-900/75 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md pointer-events-auto">
           {navLinks.map((link) => (
             <a
               key={link.id}
               href={`#${link.id}`}
               onClick={(event) => handleNavClick(event, link.id)}
-              className={`min-w-13 h-12 px-2 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${
+              className={`h-12 px-1.5 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${
                 activeSection === link.id
                   ? 'bg-linear-to-br from-cyan-400 to-emerald-400 text-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.5)]'
                   : 'text-zinc-300 hover:text-white hover:bg-white/10'
@@ -131,7 +134,7 @@ const Navbar = () => {
               aria-label={link.label}
             >
               <span className="scale-90">{link.icon}</span>
-              <span className="text-[9px] font-bold uppercase tracking-wide">{link.label}</span>
+              <span className="text-[8px] font-bold uppercase tracking-wide leading-none mt-0.5">{link.label}</span>
             </a>
           ))}
         </div>
