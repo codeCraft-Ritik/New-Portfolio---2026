@@ -18,6 +18,9 @@
     scroll-behavior: smooth;
     overflow-x: clip;
     width: 100%;
+    position: relative;
+    touch-action: pan-y; 
+    -webkit-overflow-scrolling: touch;
   }
   body  {
     background:
@@ -27,11 +30,13 @@
       var(--color-slate-950);
     color: #e2e8f0;
     font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
+    touch-action: pan-y; 
+    -webkit-font-smoothing: touch;
     overflow-x: clip;
     width: 100%;
     max-width: 100%;
     overscroll-behavior-x: none;
+    position: relative;
   }
 
   #root {
