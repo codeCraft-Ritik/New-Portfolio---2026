@@ -222,8 +222,9 @@ const BootLoader = ({ progress, liteMode = false }) => {
 const ScrollDepthSection = ({ children, className = '', intensity = 70, direction = 1, disabled = false, ...rest }) => {
   const targetRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
+  // Disable aggressive animations on mobile/lite mode to prevent jiggling
   const shouldAnimate = !disabled && !prefersReducedMotion;
-  const entryY = Math.round(intensity * direction * 0.35);
+  const entryY = Math.round(intensity * direction * 0.25); // Reduced intensity for stability
 
   if (!shouldAnimate) {
     return (
@@ -237,10 +238,10 @@ const ScrollDepthSection = ({ children, className = '', intensity = 70, directio
     <motion.div
       ref={targetRef}
       className={`scroll-depth-section ${className}`.trim()}
-      style={{ position: 'relative' }}
+      style={{ position: 'relative', perspective: '1200px' }} // Added perspective container
       initial={{ opacity: 0.7, y: entryY, scale: 0.98, rotateX: direction * 2 }}
       whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.15 }} // Trigger slightly earlier for smoothness
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       {...rest}
     >
@@ -307,7 +308,6 @@ function App() {
 
     window.addEventListener('load', onPageReady, { once: true });
 
-    // Always guarantee loader exit even if RAF or onload behaves differently on some mobile browsers.
     fallbackFinishTimeout = setTimeout(() => {
       if (cancelled) return;
       setProgress(100);
@@ -356,7 +356,7 @@ function App() {
     const lenis = new Lenis({
       duration: 1.1,
       smoothWheel: true,
-      smoothTouch: false,
+      smoothTouch: false, // Disable on touch to prevent jiggling
     });
 
     let rafId;
@@ -406,7 +406,6 @@ function App() {
 
     revealElements.forEach((el) => observer.observe(el));
 
-    // Fallback: guarantee all sections become visible even if IO callbacks are skipped.
     const fallbackTimer = window.setTimeout(forceReveal, 1800);
 
     return () => {
@@ -431,7 +430,8 @@ function App() {
   };
 
   return (
-    <main className="relative bg-slate-950 min-h-svh overflow-x-clip text-slate-200 selection:bg-cyan-500/30">
+    // Added overflow-x-hidden and w-full to the main tag to kill the jiggle
+    <main className="relative bg-slate-950 min-h-svh w-full overflow-x-hidden text-slate-200 selection:bg-cyan-500/30">
       <AnimatePresence>{isLoading && <BootLoader progress={progress} liteMode={liteMode} />}</AnimatePresence>
 
       <motion.div
@@ -451,25 +451,26 @@ function App() {
       {/* Animated Background */}
       <Background liteMode={liteMode} />
 
-        <div className="relative z-10">
+      {/* Wrapper ensures content doesn't bleed out on small screens */}
+      <div className="relative z-10 w-full max-w-full">
         <Navbar />
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 space-y-12 sm:space-y-16 md:space-y-24 pb-28 md:pb-12 lg:pb-0">
-          <ScrollDepthSection data-reveal data-reveal-delay="0" intensity={liteMode ? 24 : 60} direction={1} disabled={liteMode}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16 md:space-y-24 pb-28 md:pb-12 lg:pb-0">
+          <ScrollDepthSection data-reveal data-reveal-delay="0" intensity={liteMode ? 10 : 60} direction={1} disabled={liteMode}>
             <Hero liteMode={liteMode} />
           </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="80" intensity={liteMode ? 26 : 66} direction={-1} disabled={liteMode}>
+          <ScrollDepthSection data-reveal data-reveal-delay="80" intensity={liteMode ? 12 : 66} direction={-1} disabled={liteMode}>
             <About />
           </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="100" intensity={liteMode ? 28 : 72} direction={1} disabled={liteMode}>
+          <ScrollDepthSection data-reveal data-reveal-delay="100" intensity={liteMode ? 14 : 72} direction={1} disabled={liteMode}>
             <Education />
           </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="120" intensity={liteMode ? 30 : 76} direction={-1} disabled={liteMode}>
+          <ScrollDepthSection data-reveal data-reveal-delay="120" intensity={liteMode ? 16 : 76} direction={-1} disabled={liteMode}>
             <Skills />
           </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="140" intensity={liteMode ? 32 : 82} direction={1} disabled={liteMode}>
+          <ScrollDepthSection data-reveal data-reveal-delay="140" intensity={liteMode ? 18 : 82} direction={1} disabled={liteMode}>
             <Projects />
           </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="160" intensity={liteMode ? 28 : 70} direction={-1} disabled={liteMode}>
+          <ScrollDepthSection data-reveal data-reveal-delay="160" intensity={liteMode ? 15 : 70} direction={-1} disabled={liteMode}>
             <Contact />
           </ScrollDepthSection>
         </div>
@@ -479,7 +480,6 @@ function App() {
           <p className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.5em] relative z-10">
             Ritik Kumar // 2026 // Portfolio
           </p>
-          
         </footer>
       </div>
 
@@ -493,8 +493,8 @@ function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.9 }}
             transition={{ duration: 0.25 }}
-              className="fixed right-4 md:right-8 z-60 h-12 w-12 rounded-2xl border border-cyan-400/35 bg-slate-900/70 text-cyan-300 backdrop-blur-xl transition-all hover:-translate-y-1 hover:text-white hover:border-cyan-300 hover:shadow-[0_0_22px_rgba(34,211,238,0.35)]"
-              style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)' }}
+            className="fixed right-4 md:right-8 z-60 h-12 w-12 rounded-2xl border border-cyan-400/35 bg-slate-900/70 text-cyan-300 backdrop-blur-xl transition-all hover:-translate-y-1 hover:text-white hover:border-cyan-300 hover:shadow-[0_0_22px_rgba(34,211,238,0.35)]"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)' }}
             aria-label="Back to top"
           >
             <ArrowUp className="w-5 h-5 mx-auto" />

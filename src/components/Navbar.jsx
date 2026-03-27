@@ -36,105 +36,82 @@ const Navbar = () => {
   ];
 
   useEffect(() => {
-    const sections = navLinks
-      .map((link) => document.getElementById(link.id))
-      .filter(Boolean);
-
-    if (typeof window.IntersectionObserver !== 'function') {
-      setActiveSection(sections[0]?.id || 'home');
-      return () => {
-        clearTimeout(clickLockTimeoutRef.current);
-      };
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const lockedSection = clickLockedSectionRef.current;
-        if (lockedSection) {
-          const lockedEntry = entries.find((entry) => entry.target.id === lockedSection);
-          if (lockedEntry?.isIntersecting && lockedEntry.intersectionRatio >= 0.35) {
-            setActiveSection(lockedSection);
-            clickLockedSectionRef.current = null;
-            clearTimeout(clickLockTimeoutRef.current);
-          }
-          return;
-        }
-
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-        if (visible[0]?.target?.id) {
-          setActiveSection(visible[0].target.id);
-        }
-      },
-      {
-        threshold: [0.2, 0.45, 0.65],
-        rootMargin: '-10% 0px -45% 0px',
-      }
-    );
-
-    sections.forEach((section) => observer.observe(section));
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(clickLockTimeoutRef.current);
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: 0,
     };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !clickLockedSectionRef.current) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    navLinks.forEach((link) => {
+      const element = document.getElementById(link.id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
     <>
+      {/* Desktop Vertical Navigation */}
       <nav className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:block">
-        <div className="flex flex-col gap-4 p-3 bg-white/2 border border-white/10 backdrop-blur-2xl rounded-full shadow-2xl">
+        <div className="flex flex-col gap-4 p-3 bg-slate-900/40 border border-white/5 backdrop-blur-xl rounded-2xl shadow-2xl">
           {navLinks.map((link) => (
-            <div key={link.id} className="relative group flex items-center justify-center">
-              {/* Tooltip / Label */}
-              <AnimatePresence>
-                <div className="absolute right-14 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                  <div className="bg-white/5 border border-white/10 backdrop-blur-md px-4 py-2 rounded-xl">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400 whitespace-nowrap">
-                      {link.label}
-                    </span>
-                  </div>
-                </div>
-              </AnimatePresence>
-
-              {/* Icon Button */}
+            <div key={link.id} className="relative group">
               <a
                 href={`#${link.id}`}
                 onClick={(event) => handleNavClick(event, link.id)}
-                className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-500 ${
+                className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 ${
                   activeSection === link.id
-                    ? 'bg-linear-to-br from-cyan-400 to-emerald-400 text-slate-950 shadow-[0_0_22px_rgba(34,211,238,0.5)]'
+                    ? 'bg-linear-to-br from-cyan-400 to-blue-500 text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.5)]'
                     : 'text-zinc-500 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {link.icon}
               </a>
+              
+              <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-900 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                <span className="text-xs font-bold uppercase tracking-widest text-white">
+                  {link.label}
+                </span>
+                <div className="absolute right-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-900 border-r border-t border-white/10 rotate-45" />
+              </div>
             </div>
           ))}
         </div>
       </nav>
 
+      {/* Mobile Bottom Navigation */}
       <nav
-        className="fixed inset-x-0 z-50 px-3 lg:hidden pointer-events-none"
+        className="fixed inset-x-0 z-50 px-3 lg:hidden pointer-events-none overflow-hidden"
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
       >
-        <div className="mx-auto grid grid-cols-6 items-center gap-1 p-2 bg-slate-900/75 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md pointer-events-auto">
+        <div className="mx-auto grid grid-cols-6 items-center gap-1 p-2 bg-slate-950/80 border border-white/10 backdrop-blur-2xl rounded-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] max-w-md pointer-events-auto">
           {navLinks.map((link) => (
             <a
               key={link.id}
               href={`#${link.id}`}
               onClick={(event) => handleNavClick(event, link.id)}
-              className={`h-12 px-1.5 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${
+              className={`h-12 px-1 flex flex-col items-center justify-center rounded-xl transition-all duration-300 ${
                 activeSection === link.id
-                  ? 'bg-linear-to-br from-cyan-400 to-emerald-400 text-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.5)]'
-                  : 'text-zinc-300 hover:text-white hover:bg-white/10'
+                  ? 'bg-linear-to-br from-cyan-400 via-blue-500 to-purple-500 text-white shadow-[0_0_16px_rgba(34,211,238,0.4)]'
+                  : 'text-zinc-400 hover:text-white'
               }`}
-              aria-label={link.label}
             >
-              <span className="scale-90">{link.icon}</span>
-              <span className="text-[8px] font-bold uppercase tracking-wide leading-none mt-0.5">{link.label}</span>
+              <div className={`${activeSection === link.id ? 'scale-110' : 'scale-100'} transition-transform duration-300`}>
+                {link.icon}
+              </div>
+              <span className={`text-[8px] mt-1 font-bold uppercase tracking-tighter ${activeSection === link.id ? 'opacity-100' : 'opacity-0 h-0'} transition-all duration-300`}>
+                {link.label}
+              </span>
             </a>
           ))}
         </div>
