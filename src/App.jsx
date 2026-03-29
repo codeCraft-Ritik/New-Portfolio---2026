@@ -13,122 +13,136 @@ import Lenis from 'lenis';
 
 const BootLoader = ({ progress, liteMode = false }) => {
   const phase =
-    progress < 35 ? 'Booting visual engine' : progress < 70 ? 'Loading creative modules' : 'Polishing final pixels';
-  const activeStep = progress < 34 ? 0 : progress < 68 ? 1 : 2;
-  const statusCode = progress < 25 ? 'SYS-CAL-01' : progress < 55 ? 'VFX-LINK-72' : progress < 85 ? 'HUD-MESH-33' : 'READY-000';
-  const etaSeconds = Math.max(0, Math.ceil((100 - progress) * 0.032));
-  const stageSteps = ['Initialize', 'Render Systems', 'Launch Experience'];
-  const dataStreams = ['GPU Sync', 'Motion Core', 'UI Matrix'];
-  const briefings = ['Shaders', 'Typography', 'Interactions', 'Narrative', 'Polish'];
+    progress < 35 ? 'Initializing Core' : progress < 70 ? 'Syncing Modules' : 'Finalizing Experience';
   
-  const sparks = useMemo(
-    () =>
-      Array.from({ length: liteMode ? 10 : 18 }, (_, idx) => ({
-        id: idx,
-        x: `${6 + ((idx * 11) % 88)}%`,
-        y: `${8 + ((idx * 17) % 80)}%`,
-        delay: `${-(idx * 0.22)}s`,
-        duration: `${3 + (idx % 5) * 0.45}s`,
-      })),
-    [liteMode]
-  );
+  // Reduce particles dramatically on mobile
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const particleCount = liteMode || isMobile ? 8 : 15;
   
-  const starfield = useMemo(
-    () =>
-      Array.from({ length: liteMode ? 12 : 26 }, (_, idx) => ({
-        id: idx,
-        x: `${2 + ((idx * 17) % 94)}%`,
-        y: `${4 + ((idx * 13) % 90)}%`,
-        delay: `${-(idx * 0.18)}s`,
-        size: `${1.2 + (idx % 3) * 1.1}px`,
-      })),
-    [liteMode]
-  );
+  // High-performance background particles with memoization
+  const particles = useMemo(() => 
+    Array.from({ length: particleCount }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      duration: Math.random() * 3 + 2
+    })), [liteMode, particleCount]);
 
   return (
     <motion.div
-      // KEY FIX: Added fixed inset-0 and overflow-hidden to lock the loader
-      className="boot-loader fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center overflow-hidden touch-none"
+      // Fixed position and overflow-hidden are critical for stopping mobile jitters
+      className="boot-loader fixed inset-0 z-[9999] bg-[#020617] flex flex-col items-center justify-center overflow-hidden touch-none"
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }}
+      exit={{ 
+        opacity: 0, 
+        scale: 1.1, 
+        filter: "blur(10px)", 
+        transition: { duration: 0.8, ease: "easeInOut" } 
+      }}
     >
-      {/* STABILITY WRAPPER: 
-          Prevents orbital rings and sparks from jiggling the mobile viewport 
-      */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="boot-loader__noise" />
-        <div className="boot-loader__grid" />
-        <div className="boot-loader__scanline" />
-        <div className="boot-loader__halo" />
-        <div className="boot-loader__vignette" />
-        
-        <div className="boot-loader__starfield">
-          {starfield.map((star) => (
-            <span
-              key={`star-${star.id}`}
-              className="boot-loader__star"
-              style={{ '--sx': star.x, '--sy': star.y, '--sd': star.delay, '--ss': star.size }}
-            />
-          ))}
-        </div>
-
-        {!liteMode && (
-          <div className="boot-loader__sparks">
-            {sparks.map((spark) => (
-              <span
-                key={`spark-${spark.id}`}
-                className="boot-loader__spark"
-                style={{ '--px': spark.x, '--py': spark.y, '--pd': spark.delay, '--pt': spark.duration }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="boot-loader__center relative z-10 scale-90 sm:scale-100">
-        <div className="boot-loader__pulse" style={{ '--progress': progress / 100 }} />
-        {/* Force GPU rendering with translateZ(0) to stop stuttering */}
-        <div className="boot-loader__orbiter boot-loader__orbiter--outer" style={{ transform: 'translateZ(0)' }} />
-        <div className="boot-loader__orbiter boot-loader__orbiter--inner" style={{ transform: 'translateZ(0)' }} />
-        
-        <div className="boot-loader__core">
-          <span className="boot-loader__brand">RK</span>
-          <span className="boot-loader__sub">Portfolio Experience</span>
-        </div>
-      </div>
-
-      <div className="boot-loader__hud relative z-10 w-full max-w-[90vw] sm:max-w-md px-6">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={phase}
-            className="boot-loader__phase text-center mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.28 }}
-          >
-            {phase}
-          </motion.p>
-        </AnimatePresence>
-        
-        <div className="boot-loader__progress-track h-1 bg-white/10 rounded-full overflow-hidden mb-4">
+      {/* 1. Animated Tech Background Layer */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.05),transparent_70%)]" />
+        {particles.map((p) => (
           <motion.div
-            className="boot-loader__progress-fill h-full bg-cyan-500"
-            initial={{ width: '0%' }}
+            key={p.id}
+            className="absolute bg-cyan-500/20 rounded-full"
+            style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
+            animate={{ opacity: [0, 1, 0], y: [0, -50] }}
+            transition={{ duration: p.duration, repeat: Infinity, ease: "linear" }}
+          />
+        ))}
+      </div>
+
+      {/* 2. Central Animated Core with SVG Geometry */}
+      <div className="relative flex items-center justify-center">
+        {/* Outer Rotating SVG Ring */}
+        <motion.div
+          className="absolute w-48 h-48 sm:w-56 sm:h-56"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          style={{ transform: 'translateZ(0)' }} 
+        >
+          <svg viewBox="0 0 100 100" className="w-full h-full opacity-20">
+            <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="4 4" className="text-cyan-500" />
+          </svg>
+        </motion.div>
+
+        {/* Mid Pulsing Ring */}
+        <motion.div
+          className="absolute w-40 h-40 border-t-2 border-b-2 border-cyan-500/30 rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          style={{ transform: 'translateZ(0)' }} 
+        />
+        
+        {/* Inner Counter-Rotating Ring */}
+        <motion.div
+          className="absolute w-32 h-32 border-l-2 border-r-2 border-purple-500/30 rounded-full"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          style={{ transform: 'translateZ(0)' }}
+        />
+
+        {/* Interactive Brand Core */}
+        <motion.div 
+          className="relative w-24 h-24 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-full flex flex-col items-center justify-center shadow-[0_0_40px_rgba(6,182,212,0.25)]"
+          animate={{ scale: [1, 1.08, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <span className="text-3xl font-black text-white tracking-tighter">RK</span>
+          <div className="h-[1px] w-10 bg-linear-to-r from-transparent via-cyan-500 to-transparent my-1" />
+          <span className="text-[7px] uppercase tracking-[0.4em] text-cyan-400 font-bold">System</span>
+        </motion.div>
+      </div>
+
+      {/* 3. Responsive Progress Interface */}
+      <div className="mt-20 w-[85vw] max-w-xs flex flex-col items-center">
+        <div className="w-full flex justify-between items-end mb-3">
+          <div className="flex flex-col">
+            <motion.span 
+              key={phase}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-[9px] uppercase tracking-[0.25em] text-slate-500 font-black"
+            >
+              {phase}
+            </motion.span>
+            <span className="text-[8px] text-cyan-500/60 font-mono">STATUS_OK // NO_ERR</span>
+          </div>
+          <span className="text-3xl font-black text-white italic tabular-nums">
+            {Math.round(progress)}%
+          </span>
+        </div>
+
+        {/* High-Tech Progress Bar with Shimmer Effect */}
+        <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+          <motion.div
+            className="absolute inset-y-0 left-0 bg-linear-to-r from-cyan-500 via-blue-600 to-purple-600"
+            initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+            transition={{ type: "spring", stiffness: 40, damping: 15 }}
+          />
+          <motion.div 
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent w-24"
+            animate={{ x: ['-100%', '400%'] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
           />
         </div>
 
-        <div className="boot-loader__meta flex justify-between text-[10px] uppercase tracking-widest text-slate-400">
-          <span>Starting portfolio...</span>
-          <span className="boot-loader__percent text-cyan-400">{Math.round(progress)}%</span>
-        </div>
-
-        <div className="boot-loader__telemetry flex justify-between mt-6 text-[8px] text-slate-500">
-          <span>Code: {statusCode}</span>
-          <span>ETA: {etaSeconds}s</span>
-          <span>FPS: 120</span>
+        <div className="mt-5 flex gap-3 opacity-40">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div 
+              key={i}
+              className="w-6 h-1 bg-cyan-500 rounded-full"
+              animate={{ 
+                opacity: [0.3, 1, 0.3],
+                scaleY: [1, 1.5, 1]
+              }}
+              transition={{ delay: i * 0.15, duration: 1.2, repeat: Infinity }}
+            />
+          ))}
         </div>
       </div>
     </motion.div>
@@ -138,8 +152,17 @@ const BootLoader = ({ progress, liteMode = false }) => {
 const ScrollDepthSection = ({ children, className = '', intensity = 70, direction = 1, disabled = false, ...rest }) => {
   const targetRef = useRef(null);
   const prefersReducedMotion = useReducedMotion();
-  const shouldAnimate = !disabled && !prefersReducedMotion;
-  const entryY = Math.round(intensity * direction * 0.35);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    checkMobile();
+    const query = window.matchMedia('(max-width: 768px)');
+    query.addEventListener('change', checkMobile);
+    return () => query.removeEventListener('change', checkMobile);
+  }, []);
+  
+  const shouldAnimate = !disabled && !prefersReducedMotion && !isMobile;
 
   if (!shouldAnimate) {
     return (
@@ -154,19 +177,12 @@ const ScrollDepthSection = ({ children, className = '', intensity = 70, directio
       ref={targetRef}
       className={`scroll-depth-section ${className}`.trim()}
       style={{ position: 'relative' }}
-      initial={{ opacity: 0.7, y: entryY, scale: 0.98, rotateX: direction * 2 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       {...rest}
     >
-      <motion.span
-        className="scroll-depth-glint"
-        initial={{ opacity: 0, scaleX: 0.86 }}
-        whileInView={{ opacity: 0.35, scaleX: 1 }}
-        viewport={{ once: true, amount: 0.25 }}
-        transition={{ duration: 0.65, delay: 0.08 }}
-      />
       {children}
     </motion.div>
   );
@@ -180,91 +196,61 @@ function App() {
   const { scrollYProgress } = useScroll();
 
   const progressScaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
-    mass: 0.45,
+    stiffness: 200,
+    damping: 40,
+    mass: 0.3,
   });
   const progressGlow = useTransform(scrollYProgress, [0, 1], [0.45, 1]);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      setLiteMode(true);
-      return undefined;
-    }
-
-    const mediaQuery = window.matchMedia('(max-width: 1023px), (pointer: coarse), (hover: none), (prefers-reduced-motion: reduce)');
-    const syncMode = () => setLiteMode(mediaQuery.matches);
+    // Keep full animations on phones/tablets; only honor OS reduced-motion preference.
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const isMobile = window.matchMedia('(max-width: 768px) or (pointer: coarse)').matches;
+    const syncMode = () => setLiteMode(mediaQuery.matches || isMobile);
     syncMode();
-
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', syncMode);
-      return () => mediaQuery.removeEventListener('change', syncMode);
-    }
-    mediaQuery.addListener(syncMode);
-    return () => mediaQuery.removeListener(syncMode);
+    mediaQuery.addEventListener('change', syncMode);
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    mobileQuery.addEventListener('change', syncMode);
+    return () => {
+      mediaQuery.removeEventListener('change', syncMode);
+      mobileQuery.removeEventListener('change', syncMode);
+    };
   }, []);
 
   useEffect(() => {
     let rafId;
-    let finishTimeout;
     let startTime = 0;
-    let pageReady = document.readyState === 'complete';
-    let cancelled = false;
-
-    const minLoaderDuration = liteMode ? 900 : 1400;
-    const maxLoaderDuration = liteMode ? 2200 : 2800;
-
-    const onPageReady = () => { pageReady = true; };
-    window.addEventListener('load', onPageReady, { once: true });
+    const duration = liteMode ? 2000 : 2800;
 
     const tick = (timestamp) => {
-      if (cancelled) return;
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
+      const currentProgress = Math.min(100, (elapsed / duration) * 100);
+      setProgress(currentProgress);
 
-      const targetProgress = pageReady
-        ? 100
-        : Math.min(92, (elapsed / maxLoaderDuration) * 92);
-
-      setProgress((prev) => (targetProgress > prev ? targetProgress : prev));
-
-      const shouldFinish = (pageReady && elapsed >= minLoaderDuration) || elapsed >= maxLoaderDuration;
-
-      if (shouldFinish) {
-        setProgress(100);
-        finishTimeout = setTimeout(() => {
-          if (!cancelled) setIsLoading(false);
-        }, 240);
-        return;
+      if (elapsed < duration) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        setTimeout(() => setIsLoading(false), 400);
       }
-      rafId = requestAnimationFrame(tick);
     };
 
     rafId = requestAnimationFrame(tick);
-
-    return () => {
-      cancelled = true;
-      window.removeEventListener('load', onPageReady);
-      cancelAnimationFrame(rafId);
-      clearTimeout(finishTimeout);
-    };
+    return () => cancelAnimationFrame(rafId);
   }, [liteMode]);
 
   useEffect(() => {
-    if (isLoading || liteMode) return undefined;
-    const lenis = new Lenis({
-      duration: 1.1,
-      smoothWheel: true,
-      smoothTouch: false,
-    });
-
+    // Disable Lenis on mobile/tablet devices - causes jank
+    const isMobile = window.matchMedia('(max-width: 768px) or (pointer: coarse)').matches;
+    if (isLoading || liteMode || isMobile) return undefined;
+    
+    const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
     let rafId;
     const raf = (time) => {
       lenis.raf(time);
       rafId = requestAnimationFrame(raf);
     };
     rafId = requestAnimationFrame(raf);
-
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
@@ -274,113 +260,71 @@ function App() {
   useEffect(() => {
     if (isLoading) return undefined;
     const revealElements = document.querySelectorAll('[data-reveal]');
-    const forceReveal = () => {
-      revealElements.forEach((el) => { el.classList.add('is-visible'); });
-    };
-
-    if (typeof window.IntersectionObserver !== 'function') {
-      forceReveal();
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const delay = entry.target.getAttribute('data-reveal-delay') || '0';
-        entry.target.style.setProperty('--reveal-delay', `${delay}ms`);
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
-      });
-    }, { threshold: 0.05 });
-
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.getAttribute('data-reveal-delay') || '0';
+            entry.target.style.setProperty('--reveal-delay', `${delay}ms`);
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
     revealElements.forEach((el) => observer.observe(el));
-    const fallbackTimer = window.setTimeout(forceReveal, 1800);
-
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(fallbackTimer);
-    };
+    return () => observer.disconnect();
   }, [isLoading]);
 
   useEffect(() => {
-    if (isLoading) return undefined;
-    const updateScrollProgress = () => setShowBackToTop(window.scrollY > 540);
-    window.addEventListener('scroll', updateScrollProgress, { passive: true });
-    return () => window.removeEventListener('scroll', updateScrollProgress);
-  }, [isLoading]);
-
-  const scrollToTop = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    const updateScroll = () => setShowBackToTop(window.scrollY > 500);
+    window.addEventListener('scroll', updateScroll);
+    return () => window.removeEventListener('scroll', updateScroll);
+  }, []);
 
   return (
-    // KEY FIX: overflow-x-clip on main container prevents jiggling
-    <main className="relative bg-slate-950 min-h-svh overflow-x-clip text-slate-200 selection:bg-cyan-500/30">
+    <main className="relative bg-[#020617] min-h-svh overflow-x-clip text-slate-200 selection:bg-cyan-500/30" style={{ backfaceVisibility: 'hidden', WebkitFontSmoothing: 'antialiased' }}>
       <AnimatePresence>
         {isLoading && <BootLoader progress={progress} liteMode={liteMode} />}
       </AnimatePresence>
 
       <motion.div
-        aria-hidden="true"
-        className="fixed top-0 left-0 right-0 origin-left"
-        style={{
-          height: 3,
-          zIndex: 70,
-          scaleX: progressScaleX,
-          opacity: progressGlow,
-          background: 'linear-gradient(90deg, rgba(249,115,22,0.95), rgba(34,211,238,0.95), rgba(16,185,129,0.95))',
-          boxShadow: '0 0 16px rgba(34,211,238,0.52)',
-        }}
+        className="fixed top-0 left-0 right-0 h-[3px] bg-linear-to-r from-cyan-500 to-purple-500 z-[70] origin-left"
+        style={{ scaleX: progressScaleX, opacity: progressGlow }}
       />
 
       <Background liteMode={liteMode} />
 
-      <div className="relative z-10 w-full max-w-full">
+      <div className="relative z-10 w-full">
         <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16 md:space-y-24 pb-28 md:pb-12 lg:pb-0">
-          <ScrollDepthSection data-reveal data-reveal-delay="0" intensity={liteMode ? 24 : 60} direction={1} disabled={liteMode}>
-            <Hero liteMode={liteMode} />
-          </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="80" intensity={liteMode ? 26 : 66} direction={-1} disabled={liteMode}>
-            <About />
-          </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="100" intensity={liteMode ? 28 : 72} direction={1} disabled={liteMode}>
-            <Education />
-          </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="120" intensity={liteMode ? 30 : 76} direction={-1} disabled={liteMode}>
-            <Skills />
-          </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="140" intensity={liteMode ? 32 : 82} direction={1} disabled={liteMode}>
-            <Projects />
-          </ScrollDepthSection>
-          <ScrollDepthSection data-reveal data-reveal-delay="160" intensity={liteMode ? 28 : 70} direction={-1} disabled={liteMode}>
-            <Contact />
-          </ScrollDepthSection>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-20 pb-28 lg:pb-12">
+          <ScrollDepthSection direction={1} disabled={liteMode}><Hero liteMode={liteMode} /></ScrollDepthSection>
+          <ScrollDepthSection direction={-1} disabled={liteMode}><About /></ScrollDepthSection>
+          <ScrollDepthSection direction={1} disabled={liteMode}><Education /></ScrollDepthSection>
+          <ScrollDepthSection direction={-1} disabled={liteMode}><Skills /></ScrollDepthSection>
+          <ScrollDepthSection direction={1} disabled={liteMode}><Projects /></ScrollDepthSection>
+          <ScrollDepthSection direction={-1} disabled={liteMode}><Contact /></ScrollDepthSection>
         </div>
 
-        <footer className="py-20 border-t border-white/5 text-center relative" data-reveal data-reveal-delay="80">
-          <div className="absolute inset-0 bg-linear-to-t from-cyan-500/5 to-transparent pointer-events-none" />
-          <p className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.5em] relative z-10">
+        <footer className="py-20 border-t border-white/5 text-center">
+          <p className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.5em]">
             Ritik Kumar // 2026 // Portfolio
           </p>
         </footer>
       </div>
 
       <AnimatePresence>
-        {showBackToTop && !isLoading ? (
+        {showBackToTop && (
           <motion.button
-            key="scroll-top"
-            type="button"
-            onClick={scrollToTop}
-            initial={{ opacity: 0, y: 28, scale: 0.86 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.9 }}
-            transition={{ duration: 0.25 }}
-            className="fixed right-4 md:right-8 z-60 h-12 w-12 rounded-2xl border border-cyan-400/35 bg-slate-900/70 text-cyan-300 backdrop-blur-xl transition-all hover:-translate-y-1"
-            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)' }}
-            aria-label="Back to top"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed right-6 bottom-24 lg:bottom-10 z-[60] p-4 bg-slate-900/80 border border-white/10 rounded-2xl text-cyan-400 backdrop-blur-xl shadow-2xl transition-transform active:scale-90"
           >
-            <ArrowUp className="w-5 h-5 mx-auto" />
+            <ArrowUp size={20} />
           </motion.button>
-        ) : null}
+        )}
       </AnimatePresence>
     </main>
   );

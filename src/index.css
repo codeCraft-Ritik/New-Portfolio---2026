@@ -246,27 +246,7 @@ main {
     transform: translateY(32px) scale(0.99);
   }
 
-  .animate-float-slow,
-  .animate-float-medium,
-  .animate-float-reverse,
-  .animate-spin-slow,
-  .animate-spin-reverse,
-  .animate-holo-ring,
-  .animate-data-node,
-  .animate-scan-streak,
-  .animate-scan-streak-reverse,
-  .animate-rotate-square,
-  .animate-rotate-square-reverse,
-  .animate-rotate-square-slow,
-  .animate-hex-bounce,
-  .animate-float-card,
-  .animate-morph-shape,
-  .animate-kinetic-path,
-  .animate-glow-pulse,
-  .animate-perspective-tilt,
-  .animate-quantum-flicker {
-    animation: none !important;
-  }
+  /* Keep animation classes active on mobile for parity with desktop visuals. */
 }
 
 @media (max-width: 1024px) {
@@ -348,6 +328,111 @@ main {
 .animate-marquee-right:hover,
 .animate-marquee-left:hover {
   animation-play-state: paused;
+}
+
+/* ── About section seamless marquee ── */
+.about-marquee-shell {
+  background: transparent;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.about-marquee-track {
+  will-change: transform;
+}
+
+.animate-tech-marquee {
+  animation: techMarquee 24s linear infinite;
+}
+
+@media (min-width: 640px) {
+  .animate-tech-marquee {
+    animation-duration: 32s;
+  }
+}
+
+@media (min-width: 1024px) {
+  .animate-tech-marquee {
+    animation-duration: 38s;
+  }
+}
+
+@keyframes techMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Disable animations on mobile screens */
+@media (max-width: 640px) {
+  .animate-tech-marquee {
+    animation: none !important;
+  }
+  
+  .about-marquee-track {
+    will-change: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tech-marquee {
+    animation: none;
+  }
+}
+
+/* Disable all background animations on small screens for better mobile performance */
+@media (max-width: 768px) {
+  .animate-float-slow,
+  .animate-float-medium,
+  .animate-float-reverse,
+  .animate-spin-slow,
+  .animate-spin-reverse,
+  .animate-holo-ring,
+  .animate-data-node,
+  .animate-scan-streak,
+  .animate-scan-streak-reverse,
+  .animate-rotate-square,
+  .animate-rotate-square-reverse,
+  .animate-rotate-square-slow,
+  .animate-hex-bounce,
+  .animate-float-card,
+  .animate-morph-shape,
+  .animate-kinetic-path,
+  .animate-glow-pulse,
+  .animate-perspective-tilt,
+  .animate-quantum-flicker {
+    animation: none !important;
+  }
+  
+  /* Disable parallax effects on mobile */
+  [style*="perspective"] {
+    perspective: none !important;
+  }
+  
+  /* Remove will-change on mobile to prevent jank */
+  .scroll-depth-section {
+    will-change: auto !important;
+  }
+  
+  /* Disable backdrop blur on mobile */
+  .backdrop-blur-xl,
+  .backdrop-blur-lg,
+  .backdrop-blur {
+    backdrop-filter: none !important;
+  }
+  
+  /* Disable box shadows on mobile for better perf */
+  [class*="shadow"] {
+    box-shadow: none !important;
+  }
+  
+  /* Disable filters on mobile */
+  [style*="filter"] {
+    filter: none !important;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

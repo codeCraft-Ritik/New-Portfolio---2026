@@ -10,10 +10,13 @@ import {
 } from 'framer-motion';
 
 // Animated particle canvas
-const ParticleCanvas = () => {
+const ParticleCanvas = ({ disabled = false }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    // Disable canvas animations on mobile for better performance
+    if (disabled) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -333,7 +336,7 @@ const Background = ({ liteMode = false }) => {
       </motion.div>
 
       {/* Particle canvas */}
-      {!liteMode && <ParticleCanvas />}
+      {!liteMode && <ParticleCanvas disabled={liteMode} />}
 
       {/* Holographic rings */}
       <motion.div className="absolute inset-0 flex items-center justify-center" style={{ y: layerFar }}>

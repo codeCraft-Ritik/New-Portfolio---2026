@@ -142,21 +142,67 @@ const SkillIcon = ({ skill, index, total, globeSize }) => {
   const baseZ = z * spread;
 
   const duration = 25; // uniform rotation speed
-  const delay = -(index / total) * duration;
+  const delaySeconds = -(index / total) * duration;
   const isCompact = globeSize < 420;
 
+  // Use ref for rotation to avoid excessive state updates
+  const containerRef = useRef(null);
+  const rotationRef = useRef(0);
+
+  // Animate rotation with requestAnimationFrame for smooth 60fps animation
+  useEffect(() => {
+    // Give DOM time to mount
+    const mountTimer = setTimeout(() => {
+      const startTime = Date.now() + (delaySeconds * 1000);
+      let frameId;
+      let isRunning = true;
+      
+      const animate = () => {
+        if (!isRunning || !containerRef.current) return;
+        
+        const elapsed = (Date.now() - startTime) / 1000;
+        const rot = (elapsed / duration) * 360;
+        rotationRef.current = rot;
+        
+        // Update DOM directly
+        const opacity = (() => {
+          const normalized = ((rot % 360) + 360) % 360;
+          return normalized > 180 
+            ? 0.4 + (360 - normalized) / 1800
+            : 0.4 + normalized / 1800;
+        })();
+        
+        try {
+          containerRef.current.style.transform = `translate(-50%, -50%) rotateY(${rot}deg) translate3d(${baseX}px, ${baseY}px, ${baseZ}px) rotateY(${-rot}deg)`;
+          containerRef.current.style.opacity = opacity;
+        } catch (e) {
+          console.error('Animation error:', e);
+        }
+        
+        frameId = requestAnimationFrame(animate);
+      };
+      
+      frameId = requestAnimationFrame(animate);
+      
+      return () => {
+        isRunning = false;
+        cancelAnimationFrame(frameId);
+      };
+    }, 50);
+    
+    return () => {
+      clearTimeout(mountTimer);
+    };
+  }, [duration, delaySeconds, baseX, baseY, baseZ]);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.03 }}
-      className="skill-orbit-item absolute top-1/2 left-1/2"
+    <div
+      ref={containerRef}
+      className="skill-orbit-item absolute top-1/2 left-1/2 pointer-events-auto"
       style={{
-        '--bx': `${baseX}px`,
-        '--by': `${baseY}px`,
-        '--bz': `${baseZ}px`,
-        animation: `orbitSkill ${duration}s linear ${delay}s infinite`,
+        transformStyle: 'preserve-3d',
+        opacity: 1,
+        transform: `translate(-50%, -50%) rotateY(0deg) translate3d(${baseX}px, ${baseY}px, ${baseZ}px)`,
       }}
     >
       <div
@@ -178,7 +224,7 @@ const SkillIcon = ({ skill, index, total, globeSize }) => {
           {skill.name}
         </span>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

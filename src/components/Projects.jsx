@@ -183,19 +183,19 @@ const Projects = () => {
             </div>
 
             {/* Project Image */}
-            <div className={`relative group order-1 md:order-2 ${index % 2 === 1 ? 'md:col-start-1' : ''}`}>
+            <div className={`relative group order-1 md:order-2 w-full max-w-full overflow-hidden ${index % 2 === 1 ? 'md:col-start-1' : ''}`}>
               {project.screenshots ? (
-                <div className={`flex ${project.screenshots.length === 2 ? 'flex-col sm:flex-row' : 'flex-wrap sm:flex-nowrap'} gap-2 sm:gap-3 justify-center items-stretch`}>
+                <div className={`flex ${project.screenshots.length === 2 ? 'flex-col sm:flex-row' : 'flex-wrap sm:flex-nowrap'} gap-2 sm:gap-3 justify-center items-stretch w-full max-w-full overflow-hidden`}>
                   {project.screenshots.map((screenshot, i) => (
                     <motion.div
                       key={`${project.id}-screenshot-${i}`}
                       whileHover={{ y: -3, scale: 1.01 }}
-                      className={`${project.screenshots.length === 2 ? 'w-full sm:w-56 md:w-64' : i === 2 ? 'w-36 sm:w-48' : 'w-24 sm:w-32'} bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-blue-500/50 transition-all duration-500 group-hover:scale-105`}
+                      className={`${project.screenshots.length === 2 ? 'w-full sm:w-56 md:w-64' : i === 2 ? 'w-full sm:w-48 md:w-56' : 'w-full sm:w-32 md:w-40'} bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-blue-500/50 transition-all duration-500 group-hover:scale-105 flex-shrink-0`}
                     >
                       <img
                         src={screenshot}
                         alt={`${project.title} screenshot ${i + 1}`}
-                        className={`${project.screenshots.length === 2 ? 'h-52 sm:h-72' : i === 2 ? 'h-52 sm:h-64' : 'h-36 sm:h-48'} w-full object-cover`}
+                        className={`${project.screenshots.length === 2 ? 'h-40 sm:h-52 md:h-72' : i === 2 ? 'h-40 sm:h-52 md:h-64' : 'h-32 sm:h-36 md:h-48'} w-full object-cover`}
                       />
                     </motion.div>
                   ))}
