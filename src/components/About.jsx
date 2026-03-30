@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { MapPin, Mail, Phone, Github, Linkedin, Code2, Briefcase } from 'lucide-react';
+import profileImage from '../assets/My-Folio2.png';
 
 const About = () => {
   // Tech stack with colors
@@ -127,7 +128,7 @@ const About = () => {
               <div className="w-full aspect-square rounded-2xl bg-linear-to-br from-cyan-500 via-blue-600 to-purple-600 p-1">
                 <div className="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center overflow-hidden">
                   <img
-                    src="/profile.jpg"
+                    src={profileImage}
                     alt="Ritik"
                     className="w-full h-full object-cover rounded-2xl"
                     onError={(e) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Terminal, Github, Linkedin, Mail, Download, ChevronDown } from 'lucide-react';
-import resumePdf from '../assets/Ritik_Kumar_CV_Final.pdf';
+import resumePdf from '../assets/Ritik_Kumar_CV-best.pdf';
 
 const Hero = ({ liteMode = false }) => {
   const roles = ["Full-Stack Developer", "MERN Stack Developer", "Data Analytics Student"];
