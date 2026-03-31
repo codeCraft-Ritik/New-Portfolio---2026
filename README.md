@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://your-live-link.vercel.app">
+  <a href="https://new-portfolio-2026-sigma-puce.vercel.app/">
     <img src="https://img.shields.io/badge/Live%20Demo-View%20Website-06b6d4?style=for-the-badge&logo=vercel"/>
   </a>
 </p>
