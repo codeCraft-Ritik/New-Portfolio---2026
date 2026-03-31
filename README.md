@@ -1,18 +1,75 @@
-# React + Vite
+<h1 align="center">🌌 Ritik Kumar | Full-Stack MERN Developer</h1>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com/?lines=Full+Stack+MERN+Developer;UI/UX+Enthusiast;Open+Source+Learner&center=true&width=500&height=50">
+</p>
 
-Currently, two official plugins are available:
+<p align="center">
+  <a href="https://your-live-link.vercel.app">
+    <img src="https://img.shields.io/badge/Live%20Demo-View%20Website-06b6d4?style=for-the-badge&logo=vercel"/>
+  </a>
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 About This Project
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+An interactive, highly responsive, and 3D-animated personal portfolio website built with modern technologies like **React, Tailwind CSS, and Framer Motion**.
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+## ✨ Key Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🚀 Custom Bootloader with SVG animation  
+- 🌌 3D Interactive Hero Section  
+- ♾️ Infinite Tech Slider (Framer Motion)  
+- 📱 Fully Responsive (Mobile Optimized)  
+- 📜 Smooth Scrolling (Lenis)  
+- 🪞 Glassmorphism UI Design  
+
+---
+
+## 🛠️ Tech Stack
+
+![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![Tailwind](https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwind-css)
+![Framer Motion](https://img.shields.io/badge/Framer%20Motion-Animation-black)
+![Vite](https://img.shields.io/badge/Vite-Fast-yellow?logo=vite)
+
+- Frontend: React 19 + Vite  
+- Styling: Tailwind CSS (v4)  
+- Animations: Framer Motion  
+- Icons: Lucide React & React Icons  
+- Scroll Engine: Lenis  
+- Deployment: Vercel / Netlify  
+
+---
+
+## 📁 Featured Projects
+
+1. **Elevate AI** – AI-powered placement platform  
+2. **Quick Wheels** – MERN car rental platform  
+3. **Hostel Buddy** – Smart college living app  
+4. **IPL 2025 Analysis** – Python + Streamlit dashboard  
+5. **Zero Bucks Agency** – Web3 agency site  
+
+---
+
+## 📂 Folder Structure
+A quick look at the core component structure inside the `src` directory:
+
+```text
+src/
+├── assets/          # Images, logos, and static files
+├── components/      # Reusable React components
+│   ├── About.jsx    # About me & background info
+│   ├── Background.jsx # Animated background effects
+│   ├── Contact.jsx  # Contact form and social links
+│   ├── Education.jsx# Academic history
+│   ├── Hero.jsx     # Landing/Hero section
+│   ├── Navbar.jsx   # Top navigation bar
+│   ├── Projects.jsx # Showcased portfolio projects
+│   └── Skills.jsx   # 3D interactive skill sphere
+├── App.jsx          # Main application component
+├── main.jsx         # React entry point
+└── index.css        # Global styles and Tailwind imports
